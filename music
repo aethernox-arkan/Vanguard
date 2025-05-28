@@ -1,0 +1,71 @@
+#importinng lib
+from tkinter import *
+from tkinter import filedialog
+import os
+
+#intializ mix
+mixr.init()
+
+#play, stop, load pause, resume func
+def play_song(song_name: StringVar, songs_list: Listbox, status: StringVar):
+    song_name.set(songs_list.get(ACTIVE))
+    mixer.music.play()
+
+    status.set("Song playing")
+
+def stop_song(status:StringVar):
+    mixer.music.stop()
+    status.set('Song stopped')
+
+def load(Listbox):
+    os.chdir(filedialog.askdirectory(title='open murojaah directory'))
+
+    tracks = os.listdir()
+
+    for track in tracks:
+        Listbox.insert(END, track)
+
+def pause_song(status:StringVar):
+    mixer.music.pause()
+    status.set('song paused')
+
+def resume_song(status:StringVar):
+    mixer.music.unpause()
+    status.set('song unpaused')
+
+#creating the music gui
+root = Tk()
+root.geometry('700x220')
+root.title('Vanguard murojaah player')
+root.resizable(0, 0)
+
+#all the frames
+song_frame = LabelFrame(root, text='current surah', bg='LightBlue', width=400, height=80)
+song_frame.place(x=0, y=0)
+
+button_frame = LabelFrame(root, text='Control buttons', bg="Turquoise",width=400, height=120)
+button_frame.place(y=80)
+
+listbox_frame = LabelFrame(root, text='playlist', bg='RoyalBlue')
+listbox_frame.place(x=400, y=0, height=200, width=300)
+
+#all stringvar variables
+current_song = Stringvar(root, value='<not selected>')
+
+song_status = StringVar(root, value='<not available')
+
+#playlist listbox
+playlist = Listbox(listbox_frame, font=('Helvetica', 11), selectbackground='Gold')
+
+scroll_bar = Scrollbar(listbox_frame, orient= VERTICAL)
+scroll_bar.pack(side=RIGHT, fill=BOTH)
+
+playlist.config(yscrollcommand=scroll_bar.set)
+
+scroll_bar.config(command=playlist.yview)
+
+playlist.pack(fill=BOTH, padx=5, pady=5)
+
+#murojaah frame labels
+Label(song_frame, text='Currently playing', bg='LightBlue', font=('Times', 10, 'bold')).place(x=5, y=20)
+#row 78 in the geeks for geeks guide
