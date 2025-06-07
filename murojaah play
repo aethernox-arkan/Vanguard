@@ -1,0 +1,80 @@
+# importing libraries
+from tkinter import *
+from tkinter import filedialog
+import os
+from pygame import mixer
+
+# initialize mixer
+mixer.init()
+
+# play, stop, load, pause, resume functions
+def play_song(song_name: StringVar, songs_list: Listbox, status: StringVar):
+    song = songs_list.get(ACTIVE)
+    song_name.set(song)
+    mixer.music.load(song)
+    mixer.music.play()
+    status.set("Song playing")
+
+def stop_song(status: StringVar):
+    mixer.music.stop()
+    status.set('Song stopped')
+
+def load(listbox: Listbox):
+    os.chdir(filedialog.askdirectory(title='Open murojaah directory'))
+    tracks = os.listdir()
+    listbox.delete(0, END)  # clear previous items
+    for track in tracks:
+        if track.endswith('.mp3') or track.endswith('.wav'):
+            listbox.insert(END, track)
+
+def pause_song(status: StringVar):
+    mixer.music.pause()
+    status.set('Song paused')
+
+def resume_song(status: StringVar):
+    mixer.music.unpause()
+    status.set('Song unpaused')
+
+# creating the music gui
+root = Tk()
+root.geometry('700x220')
+root.title('Vanguard Murojaah Player')
+root.resizable(0, 0)
+
+# all the frames
+song_frame = LabelFrame(root, text='Current Surah', bg='LightBlue', width=400, height=80)
+song_frame.place(x=0, y=0)
+
+button_frame = LabelFrame(root, text='Control Buttons', bg="Turquoise", width=400, height=120)
+button_frame.place(y=80)
+
+listbox_frame = LabelFrame(root, text='Playlist', bg='RoyalBlue')
+listbox_frame.place(x=400, y=0, height=200, width=300)
+
+# all StringVar variables
+current_song = StringVar(root, value='<not selected>')
+song_status = StringVar(root, value='<not available>')
+
+# playlist listbox
+playlist = Listbox(listbox_frame, font=('Helvetica', 11), selectbackground='Gold')
+scroll_bar = Scrollbar(listbox_frame, orient=VERTICAL)
+scroll_bar.pack(side=RIGHT, fill=BOTH)
+playlist.config(yscrollcommand=scroll_bar.set)
+scroll_bar.config(command=playlist.yview)
+playlist.pack(fill=BOTH, padx=5, pady=5)
+
+# murojaah frame labels
+Label(song_frame, text='Currently playing:', bg='LightBlue', font=('Times', 10, 'bold')).place(x=5, y=20)
+song_lbl = Label(song_frame, textvariable=current_song, bg='LightBlue', font=('Times', 12))
+song_lbl.place(x=120, y=20)
+
+Label(root, textvariable=song_status, bg='LightBlue', font=('Times', 10, 'italic')).place(x=120, y=60)
+
+# control buttons
+Button(button_frame, text='Load Songs', width=10, command=lambda: load(playlist)).grid(row=0, column=0, padx=10, pady=20)
+Button(button_frame, text='Play', width=10, command=lambda: play_song(current_song, playlist, song_status)).grid(row=0, column=1, padx=10, pady=20)
+Button(button_frame, text='Pause', width=10, command=lambda: pause_song(song_status)).grid(row=0, column=2, padx=10, pady=20)
+Button(button_frame, text='Resume', width=10, command=lambda: resume_song(song_status)).grid(row=0, column=3, padx=10, pady=20)
+Button(button_frame, text='Stop', width=10, command=lambda: stop_song(song_status)).grid(row=0, column=4, padx=10, pady=20)
+
+root.mainloop()
